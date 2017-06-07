@@ -5,10 +5,7 @@
     "node": ">=6.0"
   },
   "description": "Store stage-agnostic and encrypted environment varibles in YAML files and load them with dotenv",
-  "author": {
-    "name": "DieProduktMacher",
-    "homepage": "http://www.dieproduktmacher.com"
-  },
+  "author": "DieProduktMacher <www.dieproduktmacher.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
