@@ -1,0 +1,41 @@
+{
+  "name": "serverless-env-generator-plugin",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=6.0"
+  },
+  "description": "Store stage-agnostic and encrypted environment varibles in YAML files and load them with dotenv",
+  "author": {
+    "name": "DieProduktMacher",
+    "homepage": "http://www.dieproduktmacher.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/dieproduktmachergmbh/serverless-env-generator-plugin"
+  },
+  "keywords": [
+    "serverless", "env", "environment", "credentials", "secrets", "environment variables", "aws", "kms"
+  ],
+  "main": "src/index.js",
+  "scripts": {
+    "test": "nyc mocha",
+    "lint": "standard"
+  },
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "fs-extra": "^3.0.1",
+    "js-yaml": "^3.8.4"
+  },
+  "devDependencies": {
+    "chai": "^4.0.0",
+    "chai-as-promised": "^6.0.0",
+    "mocha": "^3.4.2",
+    "nyc": "^10.3.2",
+    "sinon": "^2.3.2",
+    "standard": "^10.0.2"
+  },
+  "peerDependencies": {
+    "dotenv": "*"
+  }
+}
