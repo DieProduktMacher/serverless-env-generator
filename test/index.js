@@ -70,7 +70,7 @@ describe('index.js', () => {
     sandbox.stub(serverless.cli, 'log')
       .onCall(0).callsFake(_ => expect(_).to.equal('path.yml:'))
       .onCall(1).callsFake(_ => expect(_).to.equal('  foo: bar'))
-      .onCall(2).callsFake(_ => expect(_).to.equal('  sec: <encrypted>'))
+      .onCall(2).callsFake(_ => expect(_).to.equal('  sec: ******'))
       .onCall(3).callsFake(_ => expect(_).to.equal('otherPath.yml:'))
       .onCall(4).callsFake(_ => expect(_).to.equal('  foo: baz'))
     return envGenerator.hooks['env:env']().then(_ => {
