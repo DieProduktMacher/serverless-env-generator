@@ -12,7 +12,7 @@ const collectEnvVars = (doc, stage) => {
   if (doc && stage in doc) {
     Object.keys(doc[stage]).forEach(attribute => {
       var value = doc[stage][attribute]
-      let encrypted = (value.indexOf(ENCRYPT_PREFIX) === 0)
+      let encrypted = (typeof value === 'string' && value.indexOf(ENCRYPT_PREFIX) === 0)
       if (encrypted) value = value.substr(ENCRYPT_PREFIX.length)
       envVars.push({ attribute, value, encrypted })
     })
