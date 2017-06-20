@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/dieproduktmachergmbh/serverless-env-generator-plugin"
+    "url": "https://github.com/DieProduktMacher/serverless-env-generator"
   },
   "keywords": [
     "serverless",
