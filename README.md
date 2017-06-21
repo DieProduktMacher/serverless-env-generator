@@ -51,15 +51,15 @@ For aliases we recommend to use the service name, for administration privileges 
 ```yaml
 provider:
   name: aws
-  runtime: nodejs4.3
+  runtime: nodejs6.10
 
 functions:
   hello:
     handler: handler.hello
 
-# Add this plugin to your plugins:
+# Add serverless-env-generator to your plugins:
 plugins:
-  - serverless-env-generator-plugin
+  - serverless-env-generator
 
 # Plugin config goes into custom:
 custom:
