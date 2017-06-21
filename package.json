@@ -1,10 +1,10 @@
 {
-  "name": "serverless-env-generator-plugin",
+  "name": "serverless-env-generator",
   "version": "1.0.0",
   "engines": {
     "node": ">=6.0"
   },
-  "description": "Store stage-agnostic and encrypted environment varibles in YAML files and load them with dotenv",
+  "description": "A Serverless 1.x plugin to automatically create a .env file during deployment by merging environment variables from one or more YAML files. Variables can be securely encrypted with KMS. Multiple stages and profiles are supported.",
   "author": "DieProduktMacher <www.dieproduktmacher.com>",
   "license": "MIT",
   "repository": {
