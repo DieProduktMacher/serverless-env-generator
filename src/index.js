@@ -79,19 +79,22 @@ class ServerlessPlugin {
   }
 
   getConfig () {
-    let servicePath = this.serverless.config.servicePath || '/'
-    let stage = this.serverless.processedInput.options.stage || this.serverless.service.provider.stage
-    let keyId = this.serverless.service.custom.envEncryptionKeyId
-    return {
-      region: this.serverless.processedInput.options.region || this.serverless.service.provider.region,
-      profile: this.serverless.processedInput.options.profile || this.serverless.service.provider.profile,
-      stage: stage,
-      yamlPaths: this.serverless.service.custom.envFiles.map(envFile =>
-        path.join(servicePath, envFile)
-      ),
-      dotEnvPath: path.join(servicePath, '.env'),
-      kmsKeyId: keyId[stage] || keyId
+    if (!this.config) {
+      let servicePath = this.serverless.config.servicePath || '/'
+      let stage = this.serverless.processedInput.options.stage || this.serverless.service.provider.stage
+      let keyId = this.serverless.service.custom.envEncryptionKeyId
+      this.config = {
+        region: this.serverless.processedInput.options.region || this.serverless.service.provider.region,
+        profile: this.serverless.processedInput.options.profile || this.serverless.service.provider.profile,
+        stage: stage,
+        yamlPaths: this.serverless.service.custom.envFiles.map(envFile =>
+          path.join(servicePath, envFile)
+        ),
+        dotEnvPath: path.join(servicePath, '.env'),
+        kmsKeyId: keyId[stage] || keyId
+      }
     }
+    return this.config
   }
 }
 

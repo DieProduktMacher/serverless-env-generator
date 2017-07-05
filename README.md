@@ -24,6 +24,7 @@ Encryption is only supported for AWS due to the reliance on KMS.
 - [Getting Started](#markdown-header-getting-started)
 - [Commands](#markdown-header-commands)
 - [YAML File Structure](#markdown-header-yaml-file-structure)
+- [Usage with the serverless-plugin-webpack](#markdown-header-usage-with-the-serverless-plugin-webpack)
 
 
 # Getting Started
@@ -220,6 +221,42 @@ production:
 You can create additional YAML environment files, for example to include variables that are dynamically generated.
 Just add them to the *envFiles* in your *serverless.yml*.
 
+# Usage with the `serverless-plugin-webpack`
+
+In case you are also using the [`serverless-plugin-webpack`](https://github.com/goldwasserexchange/serverless-plugin-webpack) there are some caveats:
+
+## 1. Plugin order in `serverless.yml'
+
+You have to place `serverless-env-generator` before the `serverless-plugin-webpack` in the `serverless.yml`
+
+```yaml
+# serverless.yml
+plugins:
+  - serverless-env-generator
+  - serverless-plugin-webpack
+```
+
+## 2. Additional `dotenv-webpack`
+
+You need to have the [`dotenv-webpack`](https://github.com/mrsteele/dotenv-webpack) plugin installed:
+
+```sh
+npm install dotenv-webpack --save-dev
+```
+
+and configured:
+
+```javascript
+// webpack.config.js
+const Dotenv = require('dotenv-webpack')
+module.exports = {
+  // ...
+  plugins: [
+    // ...
+    new Dotenv()
+  ]
+}
+```
 
 # License & Credits
 
