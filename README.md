@@ -1,6 +1,8 @@
 Serverless Env Generator Plugin
 =======
 
+[![Build Status](https://travis-ci.org/DieProduktMacher/serverless-env-generator.svg?branch=develop)](https://travis-ci.org/DieProduktMacher/serverless-env-generator)
+
 This plugin automatically creates a *.env* file during deployment by merging environment variables from one or more YAML files. During runtime these variables can then be loaded into *process.env* using *dotenv*.
 
 Key features:
