@@ -232,13 +232,9 @@ describe('index.js', () => {
     })
   })
 
-  it('should add environment variables when locally invoked', () => {
-    initEnvGenerator({})
-    serverless.service.functions = {
-      test: {
-        environment: { foo: 'should_be_overwritten', foo2: 'should_be_there' }
-      }
-    }
+  it('should set environment when local-dev-server is started', () => {
+    var options = {}
+    initEnvGenerator(options)
     sandbox.stub(helper, 'getEnvVars').callsFake((attribute, decrypt, config) => {
       expect(attribute).to.eql(undefined)
       expect(decrypt).to.equal(true)
@@ -250,12 +246,10 @@ describe('index.js', () => {
       return Promise.resolve(defaultEnvFiles)
     })
     sandbox.stub(serverless.cli, 'log')
-      .onCall(0).callsFake(_ => expect(_).to.equal('Integrating YAML environemnt variables…'))
-    return envGenerator.hooks['before:invoke:local:invoke']().then(_ => {
-      expect(serverless.cli.log.callCount).to.equal(1)
-      expect(serverless.service.functions.test.environment.foo).to.equal('baz')
-      expect(serverless.service.functions.test.environment.foo2).to.equal('should_be_there')
-      expect(serverless.service.functions.test.environment.sec).to.equal('$€1')
+      .onCall(0).callsFake(_ => expect(_).to.equal('Setting YAML environemnt variables…'))
+    return envGenerator.hooks['local-dev-server:loadEnvVars']().then(_ => {
+      expect(options.environment.foo).to.equal('baz')
+      expect(options.environment.sec).to.equal('$€1')
     })
   })
 })

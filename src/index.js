@@ -18,23 +18,24 @@ class ServerlessPlugin {
           value: { usage: 'Value of the attribute', shortcut: 'v' },
           encrypt: { usage: 'Denotes that a variable should be encrypted', shortcut: 'e' },
           decrypt: { usage: 'Denotes that variables should be decrypted', shortcut: 'd' }
+        },
+        commands: {
+          generate: {
+            usage: 'Creates the .env file manually',
+            lifecycleEvents: [ 'write' ]
+          }
         }
-      },
-      'env-generate': {
-        usage: 'Creates the .env file manually (DEPRECATED)',
-        lifecycleEvents: [ 'write' ]
       }
     }
 
     this.hooks = {
       'env:env': this.envCommand.bind(this),
-      'env-generate:write': this.writeDotEnvFile.bind(this),
+      'env:generate:write': this.writeDotEnvFile.bind(this),
       'before:deploy:function:packageFunction': this.writeDotEnvFile.bind(this),
       'after:deploy:function:packageFunction': this.removeDotEnvFile.bind(this),
       'before:deploy:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
       'after:deploy:createDeploymentArtifacts': this.removeDotEnvFile.bind(this),
-      'before:invoke:local:invoke': this.addToFunctionEnvironments.bind(this),
-      'before:local-dev-server:start': this.addToFunctionEnvironments.bind(this)
+      'local-dev-server:loadEnvVars': this.setEnvironment.bind(this)
     }
   }
 
@@ -80,20 +81,18 @@ class ServerlessPlugin {
     })
   }
 
-  addToFunctionEnvironments () {
+  // Sets options.environment used by serverless-local-dev-server
+  setEnvironment () {
     let config = this.getConfig()
-    var yamlEnvironment = {}
-    this.serverless.cli.log('Integrating YAML environemnt variables…')
+    var environment = {}
+    this.serverless.cli.log('Setting YAML environemnt variables…')
     return helper.getEnvVars(undefined, true, config).then(envFiles => {
       envFiles.forEach(envFile => {
         envFile.vars.forEach(envVar => {
-          yamlEnvironment[envVar.attribute] = envVar.value
+          environment[envVar.attribute] = envVar.value
         })
       })
-      Object.keys(this.serverless.service.functions).map(funcName => {
-        let funcConfig = this.serverless.service.functions[funcName]
-        funcConfig.environment = Object.assign({}, funcConfig.environment, yamlEnvironment)
-      })
+      this.options.environment = Object.assign({}, this.options.environment, environment)
     })
   }
 
