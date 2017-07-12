@@ -5,7 +5,10 @@ Serverless Env Generator Plugin
 
 This plugin automatically creates a *.env* file during deployment by merging environment variables from one or more YAML files. During runtime these variables can then be loaded into *process.env* using *dotenv*.
 
-Key features:
+For a brief introduction, read our blogpost about [introducing serverless-env-generator](http://www.dieproduktmacher.com/introducing-serverless-env-generator/).
+
+
+### Key features:
 
 - Support for multi-stage configurations and custom profiles
 - Value of environment variables can be encrypted with AWS KMS, allowing teams to manage sensitive information in git.
@@ -14,7 +17,6 @@ Key features:
 - Environment variables can be loaded with *dotenv* at startup in Lambda without delays from KMS.
 - Supports *serverless-local-dev-server* for local development.
 
-For a brief introduction, read our blogpost about [introducing serverless-env-generator](http://www.dieproduktmacher.com/introducing-serverless-env-generator/).
 
 ### Notes
 
