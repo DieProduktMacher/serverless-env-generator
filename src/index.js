@@ -32,7 +32,9 @@ class ServerlessPlugin {
       'before:deploy:function:packageFunction': this.writeDotEnvFile.bind(this),
       'after:deploy:function:packageFunction': this.removeDotEnvFile.bind(this),
       'before:deploy:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
-      'after:deploy:createDeploymentArtifacts': this.removeDotEnvFile.bind(this)
+      'after:deploy:createDeploymentArtifacts': this.removeDotEnvFile.bind(this),
+      'before:invoke:local:invoke': this.addToProviderEnvironment.bind(this),
+      'before:local-dev-server:start': this.addToProviderEnvironment.bind(this)
     }
   }
 
@@ -78,6 +80,25 @@ class ServerlessPlugin {
     })
   }
 
+  addToProviderEnvironment () {
+    let config = this.getConfig()
+    var providerEnvironment = this.serverless.service.provider.environment || {}
+    var yamlEnvironment = {}
+    this.serverless.cli.log('Integrating YAML environemnt variables…')
+    return helper.getEnvVars(undefined, true, config).then(envFiles => {
+      envFiles.forEach(envFile => {
+        envFile.vars.forEach(envVar => {
+          if (!(envVar.attribute in providerEnvironment)) {
+            yamlEnvironment[envVar.attribute] = envVar.value
+          } else {
+            this.serverless.cli.log(`Warning: Variable '${envVar.attribute}' is already defined in serverless.yml`)
+          }
+        })
+      })
+      this.serverless.service.provider.environment = Object.assign({}, yamlEnvironment, providerEnvironment)
+    })
+  }
+
   getConfig () {
     if (!this.config) {
       let servicePath = this.serverless.config.servicePath || '/'
@@ -91,7 +112,7 @@ class ServerlessPlugin {
           path.join(servicePath, envFile)
         ),
         dotEnvPath: path.join(servicePath, '.env'),
-        kmsKeyId: keyId[stage] || keyId
+        kmsKeyId: (typeof keyId === 'object') ? keyId[stage] : keyId
       }
     }
     return this.config

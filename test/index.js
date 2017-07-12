@@ -231,4 +231,29 @@ describe('index.js', () => {
       expect(helper.getEnvVars.callCount).to.equal(1)
     })
   })
+
+  it('should add environment variables when locally invoked', () => {
+    initEnvGenerator({})
+    serverless.service.provider.environment = {
+      sec: 'sec_no_more'
+    }
+    sandbox.stub(helper, 'getEnvVars').callsFake((attribute, decrypt, config) => {
+      expect(attribute).to.eql(undefined)
+      expect(decrypt).to.equal(true)
+      expect(config.region).to.equal('eu-central-1')
+      expect(config.stage).to.equal('dev')
+      expect(config.profile).to.equal('myproject-dev')
+      expect(config.yamlPaths).to.eql([ '/some/path.yml', '/some/otherPath.yml' ])
+      expect(config.kmsKeyId).to.equal('somedevkey')
+      return Promise.resolve(defaultEnvFiles)
+    })
+    sandbox.stub(serverless.cli, 'log')
+      .onCall(0).callsFake(_ => expect(_).to.equal('Integrating YAML environemnt variables…'))
+      .onCall(1).callsFake(_ => expect(_).to.equal('Warning: Variable \'sec\' is already defined in serverless.yml'))
+    return envGenerator.hooks['before:invoke:local:invoke']().then(_ => {
+      expect(serverless.cli.log.callCount).to.equal(2)
+      expect(serverless.service.provider.environment.sec).to.equal('sec_no_more')
+      expect(serverless.service.provider.environment.foo).to.equal('baz')
+    })
+  })
 })
