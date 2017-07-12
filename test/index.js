@@ -234,8 +234,10 @@ describe('index.js', () => {
 
   it('should add environment variables when locally invoked', () => {
     initEnvGenerator({})
-    serverless.service.provider.environment = {
-      sec: 'sec_no_more'
+    serverless.service.functions = {
+      test: {
+        environment: { foo: 'should_be_overwritten', foo2: 'should_be_there' }
+      }
     }
     sandbox.stub(helper, 'getEnvVars').callsFake((attribute, decrypt, config) => {
       expect(attribute).to.eql(undefined)
@@ -249,11 +251,11 @@ describe('index.js', () => {
     })
     sandbox.stub(serverless.cli, 'log')
       .onCall(0).callsFake(_ => expect(_).to.equal('Integrating YAML environemnt variables…'))
-      .onCall(1).callsFake(_ => expect(_).to.equal('Warning: Variable \'sec\' is already defined in serverless.yml'))
     return envGenerator.hooks['before:invoke:local:invoke']().then(_ => {
-      expect(serverless.cli.log.callCount).to.equal(2)
-      expect(serverless.service.provider.environment.sec).to.equal('sec_no_more')
-      expect(serverless.service.provider.environment.foo).to.equal('baz')
+      expect(serverless.cli.log.callCount).to.equal(1)
+      expect(serverless.service.functions.test.environment.foo).to.equal('baz')
+      expect(serverless.service.functions.test.environment.foo2).to.equal('should_be_there')
+      expect(serverless.service.functions.test.environment.sec).to.equal('$€1')
     })
   })
 })
