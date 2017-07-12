@@ -19,16 +19,11 @@ class ServerlessPlugin {
           encrypt: { usage: 'Denotes that a variable should be encrypted', shortcut: 'e' },
           decrypt: { usage: 'Denotes that variables should be decrypted', shortcut: 'd' }
         }
-      },
-      'env-generate': {
-        usage: 'Creates the .env file manually',
-        lifecycleEvents: [ 'write' ]
       }
     }
 
     this.hooks = {
       'env:env': this.envCommand.bind(this),
-      'env-generate:write': this.writeDotEnvFile.bind(this),
       'before:deploy:function:packageFunction': this.writeDotEnvFile.bind(this),
       'after:deploy:function:packageFunction': this.removeDotEnvFile.bind(this),
       'before:deploy:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
