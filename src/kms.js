@@ -25,7 +25,7 @@ const getKms = module.exports._getKms = (config) => {
 // Wrapper for kms.encrypt
 module.exports.encrypt = (text, config) => {
   return new Promise((resolve, reject) => {
-    getKms(config).encrypt({ Plaintext: text }, (error, data) => {
+    getKms(config).encrypt({ Plaintext: String(text) }, (error, data) => {
       if (error) {
         reject(error)
       } else {
