@@ -4,7 +4,7 @@ const fs = require('fs-extra')
 const path = require('path')
 const helper = require('./helper.js')
 
-class ServerlessPlugin {
+class ServerlessEnvGeneratorPlugin {
   constructor (serverless, options) {
     this.serverless = serverless
     this.options = options || {}
@@ -116,4 +116,4 @@ class ServerlessPlugin {
   }
 }
 
-module.exports = ServerlessPlugin
+module.exports = ServerlessEnvGeneratorPlugin
