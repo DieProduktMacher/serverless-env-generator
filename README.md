@@ -78,7 +78,7 @@ custom:
   envFiles: #YAML files used to create .env file
     - environment.yml
   envEncryptionKeyId: #KMS Key used for encrypting values
-    development: ${env:AWS_KMS_KEYID} #Key used for development-stage
+    dev: ${env:AWS_KMS_KEYID} #Key used for development-stage
 ```
 
 ### 4. Add the .env file to your .gitignore
