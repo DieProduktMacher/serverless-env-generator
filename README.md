@@ -220,7 +220,7 @@ which are then merged into a .env file on deployment.
 File example:
 
 ```yaml
-development: #stage
+dev: #stage
     foo: bar #cleartext variable
     bla: crypted:bc89hwnch8hncoaiwjnd... #encrypted variable
 
