@@ -66,6 +66,13 @@ class ServerlessEnvGeneratorPlugin {
   writeDotEnvFile () {
     let config = this.getConfig()
     this.serverless.cli.log('Creating .env file...')
+    process
+      .on('exit', () => {
+        if (fs.existsSync(config.dotEnvPath)) {
+          fs.removeSync(config.dotEnvPath);
+            this.serverless.cli.log('Removed .env file')
+        }
+      })
     return helper.getEnvVars(undefined, true, config).then(envFiles => {
       var lines = []
       envFiles.forEach(envFile => {
