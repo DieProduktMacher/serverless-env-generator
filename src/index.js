@@ -32,9 +32,7 @@ class ServerlessEnvGeneratorPlugin {
       'env:env': this.envCommand.bind(this),
       'env:generate:write': this.writeDotEnvFile.bind(this),
       'before:deploy:function:packageFunction': this.writeDotEnvFile.bind(this),
-      'after:deploy:function:packageFunction': this.removeDotEnvFile.bind(this),
       'before:deploy:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
-      'after:deploy:createDeploymentArtifacts': this.removeDotEnvFile.bind(this),
       'local-dev-server:loadEnvVars': this.setEnvironment.bind(this)
     }
   }
@@ -71,13 +69,6 @@ class ServerlessEnvGeneratorPlugin {
         })
       })
       return fs.writeFile(config.dotEnvPath, lines.join('\n'))
-    })
-  }
-
-  removeDotEnvFile () {
-    let config = this.getConfig()
-    return fs.remove(config.dotEnvPath).then(_ => {
-      this.serverless.cli.log('Removed .env file')
     })
   }
 
