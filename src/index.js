@@ -33,8 +33,6 @@ class ServerlessEnvGeneratorPlugin {
       'env:generate:write': this.writeDotEnvFile.bind(this),
       'invoke:test:test': this.writeDotEnvFile.bind(this),
       'before:offline:start:init': this.writeDotEnvFile.bind(this),
-      'before:invoke:local:invoke': this.writeDotEnvFile.bind(this),
-      'after:invoke:local:invoke': this.removeDotEnvFile.bind(this),
       'before:deploy:function:packageFunction': this.writeDotEnvFile.bind(this),
       'after:deploy:function:packageFunction': this.removeDotEnvFile.bind(this),
       'before:deploy:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
