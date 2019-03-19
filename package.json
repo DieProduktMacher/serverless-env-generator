@@ -28,19 +28,22 @@
   },
   "dependencies": {
     "aws-sdk": "^2.64.0",
+    "chalk": "^2.4.2",
+    "dotenv": "^7.0.0",
+    "dotenv-expand": "^5.1.0",
     "fs-extra": "^3.0.1",
     "js-yaml": "^3.8.4"
   },
   "devDependencies": {
     "chai": "^4.0.0",
-    "chai-as-promised": "^6.0.0",
+    "chai-as-promised": "^7.1.1",
+    "dotenv": "^7.0.0",
+    "dotenv-expand": "^5.1.0",
     "mocha": "^3.4.2",
     "nyc": "^10.3.2",
     "serverless": "^1.14.0",
     "sinon": "^2.3.2",
     "standard": "^10.0.2"
   },
-  "peerDependencies": {
-    "dotenv": "*"
-  }
+  "peerDependencies": {}
 }

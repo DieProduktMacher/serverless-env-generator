@@ -1,27 +1,38 @@
 /* global describe it beforeEach afterEach */
-const expect = require('chai').expect
+const chai = require('chai')
 const sinon = require('sinon')
 const fs = require('fs-extra')
 const Serverless = require('serverless/lib/Serverless')
 const AwsProvider = require('serverless/lib/plugins/aws/provider/awsProvider')
 const EnvGenerator = require('../src')
 const helper = require('../src/helper')
+const chaiAsPromised = require('chai-as-promised');
+const expect = chai.expect
+chai.use(chaiAsPromised)
 
-const defaultEnvFiles = [
-  {
+const defaultEnvFiles = [{
     file: 'path.yml',
     filePath: './some/path.yml',
-    vars: [
-      { attribute: 'foo', value: 'bar', encrypted: false },
-      { attribute: 'sec', value: '$€1', encrypted: true }
+    vars: [{
+        attribute: 'foo',
+        value: 'bar',
+        encrypted: false
+      },
+      {
+        attribute: 'sec',
+        value: '$€1',
+        encrypted: true
+      }
     ]
   },
   {
     file: 'otherPath.yml',
     filePath: './some/otherPath.yml',
-    vars: [
-      { attribute: 'foo', value: 'baz', encrypted: false }
-    ]
+    vars: [{
+      attribute: 'foo',
+      value: 'baz',
+      encrypted: false
+    }]
   }
 ]
 
@@ -39,8 +50,11 @@ describe('index.js', () => {
     serverless.service.provider.stage = 'dev'
     serverless.service.provider.profile = 'myproject-dev'
     serverless.service.provider.region = 'eu-central-1'
-    serverless.service.custom.envFiles = [ '/some/path.yml', '/some/otherPath.yml' ]
-    serverless.service.custom.envEncryptionKeyId = { dev: 'somedevkey', prod: 'someprodkey' }
+    serverless.service.custom.envFiles = ['/some/path.yml', '/some/otherPath.yml']
+    serverless.service.custom.envEncryptionKeyId = {
+      dev: 'somedevkey',
+      prod: 'someprodkey'
+    }
     serverless.init()
     serverless.setProvider('aws', new AwsProvider(serverless))
   })
@@ -63,7 +77,7 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql([ '/some/path.yml', '/some/otherPath.yml' ])
+      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(defaultEnvFiles)
     })
@@ -92,7 +106,7 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-2')
       expect(config.stage).to.equal('prod')
       expect(config.profile).to.equal('myproject-prod')
-      expect(config.yamlPaths).to.eql([ '/some/path.yml', '/some/otherPath.yml' ])
+      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('someprodkey')
       return Promise.resolve(defaultEnvFiles)
     })
@@ -115,7 +129,7 @@ describe('index.js', () => {
       expect(decrypt).to.equal(true)
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
-      expect(config.yamlPaths).to.eql([ '/some/path.yml', '/some/otherPath.yml' ])
+      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(defaultEnvFiles)
     })
@@ -143,7 +157,7 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql([ '/some/path.yml', '/some/otherPath.yml' ])
+      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(true)
     })
@@ -167,7 +181,7 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql([ '/some/path.yml', '/some/otherPath.yml' ])
+      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(true)
     })
@@ -183,7 +197,7 @@ describe('index.js', () => {
       value: 'lalala',
       encrypt: true
     })
-    return expect(envGenerator.hooks['env:env']()).to.be.rejected
+    return expect(envGenerator.hooks['env:env']()).to.be.eventually.rejected;
   })
 
   it('should write and delete .env file on deployment', () => {
@@ -194,7 +208,7 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql([ '/some/path.yml', '/some/otherPath.yml' ])
+      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(defaultEnvFiles)
     })
@@ -215,7 +229,7 @@ describe('index.js', () => {
     ).then(_ => {
       expect(fs.writeFile.callCount).to.equal(1)
       expect(fs.remove.callCount).to.equal(1)
-      expect(serverless.cli.log.callCount).to.equal(2)
+      expect(serverless.cli.log.callCount).to.equal(3)
     })
   })
 
@@ -241,12 +255,12 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql([ '/some/path.yml', '/some/otherPath.yml' ])
+      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(defaultEnvFiles)
     })
     sandbox.stub(serverless.cli, 'log')
-      .onCall(0).callsFake(_ => expect(_).to.equal('Setting YAML environemnt variables…'))
+      .onCall(0).callsFake(_ => expect(_).to.equal('Setting YAML environment variables …'))
     return envGenerator.hooks['local-dev-server:loadEnvVars']().then(_ => {
       expect(options.environment.foo).to.equal('baz')
       expect(options.environment.sec).to.equal('$€1')
