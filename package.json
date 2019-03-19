@@ -1,8 +1,8 @@
 {
   "name": "serverless-env-generator",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "engines": {
-    "node": ">=6.0"
+    "node": ">=8.0"
   },
   "description": "A Serverless 1.x plugin to automatically create a .env file during deployment by merging environment variables from one or more YAML files. Variables can be securely encrypted with KMS. Multiple stages and profiles are supported.",
   "author": "DieProduktMacher <www.dieproduktmacher.com>",
