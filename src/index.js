@@ -4,8 +4,6 @@ const fs = require('fs-extra')
 const path = require('path')
 const helper = require('./helper.js')
 const dotenv = require('dotenv')
-const dotenvExpand = require('dotenv-expand')
-const chalk = require('chalk')
 
 class ServerlessEnvGeneratorPlugin {
   constructor(serverless, options) {
