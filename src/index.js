@@ -46,6 +46,8 @@ class ServerlessEnvGeneratorPlugin {
     this.hooks = {
       'env:env': this.envCommand.bind(this),
       'env:generate:write': this.writeDotEnvFile.bind(this),
+      'invoke:test:test': this.writeDotEnvFile.bind(this),
+      'before:offline:start:init': this.writeDotEnvFile.bind(this),
       'before:deploy:function:packageFunction': this.writeDotEnvFile.bind(this),
       'after:deploy:function:packageFunction': this.removeDotEnvFile.bind(this),
       'before:deploy:createDeploymentArtifacts': this.createFileAndLoad.bind(this),
@@ -132,6 +134,13 @@ class ServerlessEnvGeneratorPlugin {
   writeDotEnvFile() {
     let config = this.getConfig()
     this.serverless.cli.log('Creating .env file...')
+    process
+      .on('exit', () => {
+        if (fs.existsSync(config.dotEnvPath)) {
+          fs.removeSync(config.dotEnvPath);
+            this.serverless.cli.log('Removed .env file')
+        }
+      })
     return helper.getEnvVars(undefined, true, config).then(envFiles => {
       var lines = []
       envFiles.forEach(envFile => {
