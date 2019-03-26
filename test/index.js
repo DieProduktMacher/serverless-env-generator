@@ -64,6 +64,7 @@ describe('index.js', () => {
     serverless.service.provider.stage = 'dev'
     serverless.service.provider.profile = 'myproject-dev'
     serverless.service.provider.region = 'eu-central-1'
+    serverless.service.provider.environment = {}
     serverless.service.custom.envFiles = ['some/path.yml', 'some/otherPath.yml']
     serverless.service.custom.envEncryptionKeyId = {
       dev: 'somedevkey',

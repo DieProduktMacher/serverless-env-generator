@@ -115,8 +115,7 @@ class ServerlessEnvGeneratorPlugin {
           environment[envVar.attribute] = envVar.value
         })
       })
-      console.log(path.join(config.servicePath, '.env.local'))
-      this.options.environment = Object.assign({}, this.options.environment, environment, dotenv.config({ path: path.join(config.servicePath, '.env.local') }).parsed)
+      this.options.environment = Object.assign(this.serverless.service.provider.environment, environment, dotenv.config({ path: path.join(config.servicePath, '.env.local') }).parsed)
     })
   }
 
