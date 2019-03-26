@@ -47,66 +47,12 @@ class ServerlessEnvGeneratorPlugin {
       'env:env': this.envCommand.bind(this),
       'env:generate:write': this.writeDotEnvFile.bind(this),
       'invoke:test:test': this.writeDotEnvFile.bind(this),
-      'before:offline:start:init': this.writeDotEnvFile.bind(this),
       'before:deploy:function:packageFunction': this.writeDotEnvFile.bind(this),
       'after:deploy:function:packageFunction': this.removeDotEnvFile.bind(this),
-      'before:deploy:createDeploymentArtifacts': this.createFileAndLoad.bind(this),
+      'before:deploy:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
       'after:deploy:createDeploymentArtifacts': this.removeDotEnvFile.bind(this),
-      'local-dev-server:loadEnvVars': this.setEnvironment.bind(this),
-      'before:offline:start:init': this.loadOfflineEnv.bind(this)
-    }
-  }
-
-  async createFileAndLoad() {
-    await this.writeDotEnvFile()
-    await this.loadEnv()
-  }
-
-  loadOfflineEnv() {
-    this.loadEnv(true)
-  }
-
-  async loadEnv(isLocal) {
-    let {
-      dotEnvPath: envFileName,
-      servicePath
-    } = this.getConfig()
-
-    if (isLocal) {
-      console.log('servicePath', servicePath)
-      try {
-        envFileName = path.join(servicePath, '.env.local')
-      } catch (error) {}
-    }
-
-    try {
-
-      let envVars = dotenvExpand(dotenv.config({
-        path: envFileName
-      })).parsed
-
-      if (envVars) {
-        this.serverless.cli.log(
-          'DOTENV: Loading environment variables from ' + envFileName + ':'
-        )
-
-        // Check default
-        this.serverless.service.provider.environment = this.serverless.service.provider.environment || {}
-
-        Object.keys(envVars).forEach(key => {
-          this.serverless.cli.log('\t - ' + key)
-          this.serverless.service.provider.environment[key] = envVars[key]
-        })
-      } else {
-        this.serverless.cli.log('Removed .env file')
-      }
-    } catch (e) {
-      console.error(
-        chalk.red(
-          '\n Serverless Plugin Error --------------------------------------\n'
-        )
-      )
-      console.error(chalk.red('  ' + e.message))
+      'before:offline:start:init': this.setEnvironment.bind(this),
+      'local-dev-server:loadEnvVars': this.setEnvironment.bind(this)
     }
   }
 
@@ -142,12 +88,13 @@ class ServerlessEnvGeneratorPlugin {
         }
       })
     return helper.getEnvVars(undefined, true, config).then(envFiles => {
-      var lines = []
+      const environment = {}
       envFiles.forEach(envFile => {
         envFile.vars.forEach(envVar => {
-          lines.push(`${envVar.attribute}=${envVar.value}`)
+          environment[envVar.attribute] = envVar.value
         })
       })
+      const lines = Object.keys(environment).map(key => `${key}=${environment[key]}`)
       return fs.writeFile(config.dotEnvPath, lines.join('\n'))
     })
   }
@@ -161,22 +108,23 @@ class ServerlessEnvGeneratorPlugin {
 
   // Sets options.environment used by serverless-local-dev-server
   setEnvironment() {
-    let config = this.getConfig()
-    var environment = {}
+    const config = this.getConfig()
     this.serverless.cli.log('Setting YAML environment variables …')
     return helper.getEnvVars(undefined, true, config).then(envFiles => {
+      const environment = {}
       envFiles.forEach(envFile => {
         envFile.vars.forEach(envVar => {
           environment[envVar.attribute] = envVar.value
         })
       })
-      this.options.environment = Object.assign({}, this.options.environment, environment)
+      console.log(path.join(config.servicePath, '.env.local'))
+      this.options.environment = Object.assign({}, this.options.environment, environment, dotenv.config({ path: path.join(config.servicePath, '.env.local') }).parsed)
     })
   }
 
   getConfig() {
     if (!this.config) {
-      let servicePath = this.serverless.config.servicePath || '/'
+      let servicePath = this.serverless.config.servicePath || './'
       let stage = this.serverless.processedInput.options.stage || this.serverless.service.provider.stage
       let keyId = this.serverless.service.custom.envEncryptionKeyId
       this.config = {
