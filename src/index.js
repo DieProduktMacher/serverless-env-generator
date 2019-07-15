@@ -50,6 +50,8 @@ class ServerlessEnvGeneratorPlugin {
       'before:deploy:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
       'after:deploy:createDeploymentArtifacts': this.removeDotEnvFile.bind(this),
       'before:offline:start:init': this.setEnvironment.bind(this),
+      'before:invoke:local:invoke': this.writeDotEnvFile.bind(this),
+      'after:invoke:local:invoke': this.removeDotEnvFile.bind(this),
       'local-dev-server:loadEnvVars': this.setEnvironment.bind(this)
     }
   }
