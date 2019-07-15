@@ -1,7 +1,10 @@
 Serverless Env Generator Plugin
 =======
 
-[![Build Status](https://travis-ci.org/DieProduktMacher/serverless-env-generator.svg?branch=develop)](https://travis-ci.org/DieProduktMacher/serverless-env-generator)
+[![License][ico-license]][link-license] [![NPM][ico-npm]][link-npm] [![Build Status][ico-build]][link-build] [![Requirements Status][ico-requirements]][link-requirements] [![Coverage Status][ico-coverage]][link-coverage]
+
+[ico-coverage]: https://coveralls.io/repos/github/DieProduktMacher/serverless-env-generator/badge.svg?branch=develop
+[link-coverage]: https://coveralls.io/github/DieProduktMacher/serverless-env-generator?branch=master
 
 This plugin automatically creates a *.env* file during deployment by merging environment variables from one or more YAML files. During runtime these variables can then be loaded into *process.env* using *dotenv*.
 
@@ -15,7 +18,8 @@ For a brief introduction, read our blogpost about [introducing serverless-env-ge
 - By using KMS, access to secrets can be controlled with IAM. We recommend to create one KMS key per serverless-profile, so you can limit access to credentials to deployment privileges.
 - During deployment a temporary .env file is created and uploaded to Lambda by merging and decrypting values of your environment YAML files.
 - Environment variables can be loaded with *dotenv* at startup in Lambda without delays from KMS.
-- Supports *serverless-local-dev-server* for local development.
+- Supports *serverless-local-dev-server* and *serverless offline* for local development.
+
 
 
 ### Notes
@@ -33,10 +37,19 @@ The `.env.local` file in the project root is here only for the tests.
 
 # Table of Contents
 
-- [Getting Started](#markdown-header-getting-started)
-- [Commands](#markdown-header-commands)
-- [YAML File Structure](#markdown-header-yaml-file-structure)
-- [Usage with the serverless-plugin-webpack](#markdown-header-usage-with-the-serverless-plugin-webpack)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+- [Commands](#commands)
+- [YAML File Structure](#yaml-file-structure)
+- [Usage with the serverless-plugin-webpack](#usage-with-the-serverless-plugin-webpack)
+- [Contribute](#contribute)
+
+
+# Requirements
+
+- node >= 8.0
+- serverless >= 1.14
+- [See below for usage with serverless-plugin-webpack](#usage-with-the-serverless-plugin-webpack)
 
 
 # Getting Started
@@ -64,7 +77,7 @@ For aliases we recommend to use the service name, for administration privileges 
 ```yaml
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs8.10
 
 functions:
   hello:
@@ -270,6 +283,13 @@ module.exports = {
 }
 ```
 
+# Contribute
+Anyone is more than welcome to contribute to the serverless-env-generator plugin. Here just a few things to consider when doing so:
+
+- this project uses yarn as a package manager
+- make sure to pass all tests (run *yarn test*)
+- you can add your local *serverless-env-generator* version to other projects: yarn add --dev file:/../serverless-env-generator
+
 # License & Credits
 
 Licensed under the MIT license.
@@ -277,3 +297,15 @@ Licensed under the MIT license.
 Created and maintained by [DieProduktMacher](http://www.dieproduktmacher.com).
 
 Inspired by [Serverless Crypt](https://github.com/marcy-terui/serverless-crypt).
+
+[ico-license]: https://img.shields.io/github/license/dieproduktmacher/serverless-env-generator.svg
+[ico-npm]: https://img.shields.io/npm/v/serverless-env-generator.svg
+[ico-build]: https://travis-ci.org/DieProduktMacher/serverless-env-generator.svg?branch=develop
+[ico-contributors]: https://img.shields.io/github/contributors/dieproduktmacher/serverless-env-generator.svg
+[ico-requirements]: https://requires.io/github/DieProduktMacher/serverless-env-generator/requirements.svg?branch=master
+
+[link-license]: ./LICENSE.txt
+[link-npm]: https://www.npmjs.com/package/serverless-env-generator  
+[link-build]: https://travis-ci.org/DieProduktMacher/serverless-env-generator
+[link-contributors]: https://github.com/DieProduktMacher/serverless-env-generator/graphs/contributors
+[link-requirements]: https://requires.io/github/DieProduktMacher/serverless-env-generator/requirements/?branch=master
