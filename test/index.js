@@ -12,25 +12,39 @@ chai.use(chaiAsPromised)
 
 const defaultEnvFiles = [{
     file: 'path.yml',
-    filePath: './some/path.yml',
+    filePath: 'some/path.yml',
     vars: [{
-        attribute: 'foo',
-        value: 'bar',
-        encrypted: false
-      },
-      {
-        attribute: 'sec',
-        value: '$€1',
-        encrypted: true
-      }
-    ]
+      attribute: 'foo',
+      value: 'foo',
+      encrypted: false
+    },
+    {
+      attribute: 'bar',
+      value: 'bar',
+      encrypted: false
+    },
+    {
+      attribute: 'baz',
+      value: 'baz',
+      encrypted: false
+    },
+    {
+      attribute: 'sec',
+      value: '$€1',
+      encrypted: true
+    }]
   },
   {
     file: 'otherPath.yml',
-    filePath: './some/otherPath.yml',
+    filePath: 'some/otherPath.yml',
     vars: [{
-      attribute: 'foo',
-      value: 'baz',
+      attribute: 'bar',
+      value: 'baar',
+      encrypted: false
+    },
+    {
+      attribute: 'baz',
+      value: 'baaz',
       encrypted: false
     }]
   }
@@ -50,7 +64,8 @@ describe('index.js', () => {
     serverless.service.provider.stage = 'dev'
     serverless.service.provider.profile = 'myproject-dev'
     serverless.service.provider.region = 'eu-central-1'
-    serverless.service.custom.envFiles = ['/some/path.yml', '/some/otherPath.yml']
+    serverless.service.provider.environment = {}
+    serverless.service.custom.envFiles = ['some/path.yml', 'some/otherPath.yml']
     serverless.service.custom.envEncryptionKeyId = {
       dev: 'somedevkey',
       prod: 'someprodkey'
@@ -77,23 +92,26 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
+      expect(config.yamlPaths).to.eql(['some/path.yml', 'some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(defaultEnvFiles)
     })
     sandbox.stub(serverless.cli, 'log')
       .onCall(0).callsFake(_ => expect(_).to.equal('path.yml:'))
-      .onCall(1).callsFake(_ => expect(_).to.equal('  foo: bar'))
-      .onCall(2).callsFake(_ => expect(_).to.equal('  sec: ******'))
-      .onCall(3).callsFake(_ => expect(_).to.equal('otherPath.yml:'))
-      .onCall(4).callsFake(_ => expect(_).to.equal('  foo: baz'))
+      .onCall(1).callsFake(_ => expect(_).to.equal('  foo: foo'))
+      .onCall(2).callsFake(_ => expect(_).to.equal('  bar: bar'))
+      .onCall(3).callsFake(_ => expect(_).to.equal('  baz: baz'))
+      .onCall(4).callsFake(_ => expect(_).to.equal('  sec: ******'))
+      .onCall(5).callsFake(_ => expect(_).to.equal('otherPath.yml:'))
+      .onCall(6).callsFake(_ => expect(_).to.equal('  bar: baar'))
+      .onCall(7).callsFake(_ => expect(_).to.equal('  baz: baaz'))
     return envGenerator.hooks['env:env']().then(_ => {
       expect(helper.getEnvVars.callCount).to.equal(1)
-      expect(serverless.cli.log.callCount).to.equal(5)
     })
   })
 
   it('should list environment variables for attribute "foo", stage "prod" and region "eu-central-2"', () => {
+    serverless.service.custom.envFiles = ['some/newPath.yml']
     serverless.processedInput.options.stage = 'prod'
     serverless.processedInput.options.profile = 'myproject-prod'
     serverless.processedInput.options.region = 'eu-central-2'
@@ -106,15 +124,13 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-2')
       expect(config.stage).to.equal('prod')
       expect(config.profile).to.equal('myproject-prod')
-      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('someprodkey')
       return Promise.resolve(defaultEnvFiles)
     })
     sandbox.stub(serverless.cli, 'log')
       .onCall(0).callsFake(_ => expect(_).to.equal('path.yml:'))
-      .onCall(1).callsFake(_ => expect(_).to.equal('  foo: bar'))
-      .onCall(3).callsFake(_ => expect(_).to.equal('otherPath.yml:'))
-      .onCall(4).callsFake(_ => expect(_).to.equal('  foo: baz'))
+      .onCall(1).callsFake(_ => expect(_).to.equal('  foo: foo'))
+
     return envGenerator.hooks['env:env']().then(_ => {
       expect(helper.getEnvVars.callCount).to.equal(1)
     })
@@ -129,16 +145,19 @@ describe('index.js', () => {
       expect(decrypt).to.equal(true)
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
-      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
+      expect(config.yamlPaths).to.eql(['some/path.yml', 'some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(defaultEnvFiles)
     })
     sandbox.stub(serverless.cli, 'log')
       .onCall(0).callsFake(_ => expect(_).to.equal('path.yml:'))
-      .onCall(1).callsFake(_ => expect(_).to.equal('  foo: bar'))
-      .onCall(2).callsFake(_ => expect(_).to.equal('  sec: $€1 (encrypted)'))
-      .onCall(3).callsFake(_ => expect(_).to.equal('otherPath.yml:'))
-      .onCall(4).callsFake(_ => expect(_).to.equal('  foo: baz'))
+      .onCall(1).callsFake(_ => expect(_).to.equal('  foo: foo'))
+      .onCall(2).callsFake(_ => expect(_).to.equal('  bar: bar'))
+      .onCall(3).callsFake(_ => expect(_).to.equal('  baz: baz'))
+      .onCall(4).callsFake(_ => expect(_).to.equal('  sec: $€1 (encrypted)'))
+      .onCall(5).callsFake(_ => expect(_).to.equal('otherPath.yml:'))
+      .onCall(6).callsFake(_ => expect(_).to.equal('  bar: baar'))
+      .onCall(7).callsFake(_ => expect(_).to.equal('  baz: baaz'))
     return envGenerator.hooks['env:env']().then(_ => {
       expect(helper.getEnvVars.callCount).to.equal(1)
     })
@@ -157,7 +176,7 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
+      expect(config.yamlPaths).to.eql(['some/path.yml', 'some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(true)
     })
@@ -181,7 +200,7 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
+      expect(config.yamlPaths).to.eql(['some/path.yml', 'some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(true)
     })
@@ -208,28 +227,25 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
+      expect(config.yamlPaths).to.eql(['some/path.yml', 'some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(defaultEnvFiles)
     })
     sandbox.stub(fs, 'writeFile').callsFake((file, content) => {
-      expect(file).to.equal('/.env')
-      expect(content).to.equal('foo=bar\nsec=$€1\nfoo=baz')
+      expect(file).to.equal('.env')
+      expect(content).to.equal('foo=foo\nbar=baar\nbaz=baaz\nsec=$€1')
       return Promise.resolve()
     })
     sandbox.stub(fs, 'remove').callsFake((file) => {
-      expect(file).to.equal('/.env')
+      expect(file).to.equal('.env')
       return Promise.resolve()
     })
     sandbox.stub(serverless.cli, 'log')
-      .onCall(0).callsFake(_ => expect(_).to.equal('Creating .env file...'))
-      .onCall(1).callsFake(_ => expect(_).to.equal('Removed .env file'))
     return envGenerator.hooks['before:deploy:createDeploymentArtifacts']().then(_ =>
       envGenerator.hooks['after:deploy:createDeploymentArtifacts']()
     ).then(_ => {
       expect(fs.writeFile.callCount).to.equal(1)
       expect(fs.remove.callCount).to.equal(1)
-      expect(serverless.cli.log.callCount).to.equal(3)
     })
   })
 
@@ -255,15 +271,15 @@ describe('index.js', () => {
       expect(config.region).to.equal('eu-central-1')
       expect(config.stage).to.equal('dev')
       expect(config.profile).to.equal('myproject-dev')
-      expect(config.yamlPaths).to.eql(['/some/path.yml', '/some/otherPath.yml'])
+      expect(config.yamlPaths).to.eql(['some/path.yml', 'some/otherPath.yml'])
       expect(config.kmsKeyId).to.equal('somedevkey')
       return Promise.resolve(defaultEnvFiles)
     })
     sandbox.stub(serverless.cli, 'log')
-      .onCall(0).callsFake(_ => expect(_).to.equal('Setting YAML environment variables …'))
     return envGenerator.hooks['local-dev-server:loadEnvVars']().then(_ => {
-      expect(options.environment.foo).to.equal('baz')
-      expect(options.environment.sec).to.equal('$€1')
+      expect(options.environment.foo).to.equal('foo')
+      expect(options.environment.bar).to.equal('baar')
+      expect(options.environment.baz).to.equal('baaaz')
     })
   })
 })

@@ -4,11 +4,11 @@ const sinon = require('sinon')
 const fs = require('fs-extra')
 const yaml = require('../src/yaml')
 
-const yamlText = `
-dev:
+const yamlText = `dev:
   foo: bar
 prod:
-  foo: baz`
+  foo: baz
+`
 
 const yamlDoc = {
   dev: { foo: 'bar' },
@@ -55,9 +55,10 @@ describe('yaml.js', () => {
     sandbox.stub(fs, 'writeFile').callsFake((path, content) => {
       expect(path).to.equal('./some/path.yml')
       expect(content).to.equal(yamlText)
+      return Promise.resolve()
     })
-  })
-  return yaml.write(yamlDoc, './some/path.yml').then(_ => {
-    expect(fs.writeFile.callCount).to.equal(1)
+    return yaml.write('./some/path.yml', yamlDoc).then(_ => {
+      expect(fs.writeFile.callCount).to.equal(1)
+    })
   })
 })
