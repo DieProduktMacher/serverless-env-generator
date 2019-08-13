@@ -47,12 +47,11 @@ class ServerlessEnvGeneratorPlugin {
       'invoke:test:test': this.writeDotEnvFile.bind(this),
       'before:deploy:function:packageFunction': this.writeDotEnvFile.bind(this),
       'after:deploy:function:packageFunction': this.removeDotEnvFile.bind(this),
-      'before:deploy:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
-      'after:deploy:createDeploymentArtifacts': this.removeDotEnvFile.bind(this),
+      'before:package:createDeploymentArtifacts': this.writeDotEnvFile.bind(this),
+      'after:package:createDeploymentArtifacts': this.removeDotEnvFile.bind(this),
       'before:offline:start:init': this.setEnvironment.bind(this),
       'before:invoke:local:invoke': this.writeDotEnvFile.bind(this),
-      'after:invoke:local:invoke': this.removeDotEnvFile.bind(this),
-      'local-dev-server:loadEnvVars': this.setEnvironment.bind(this)
+      'after:invoke:local:invoke': this.removeDotEnvFile.bind(this)
     }
   }
 
@@ -84,7 +83,7 @@ class ServerlessEnvGeneratorPlugin {
       .on('exit', () => {
         if (fs.existsSync(config.dotEnvPath)) {
           fs.removeSync(config.dotEnvPath);
-            this.serverless.cli.log('Removed .env file')
+          this.serverless.cli.log('Removed .env file')
         }
       })
     return helper.getEnvVars(undefined, true, config).then(envFiles => {
@@ -106,7 +105,7 @@ class ServerlessEnvGeneratorPlugin {
     })
   }
 
-  // Sets options.environment used by serverless-local-dev-server
+  // Sets environment vars in serverless.service.provider.environment
   setEnvironment() {
     const config = this.getConfig()
     this.serverless.cli.log('Setting YAML environment variables …')
@@ -117,7 +116,7 @@ class ServerlessEnvGeneratorPlugin {
           environment[envVar.attribute] = envVar.value
         })
       })
-      this.options.environment = Object.assign(this.serverless.service.provider.environment, environment, dotenv.config({ path: path.join(config.servicePath, '.env.local') }).parsed)
+      this.serverless.service.provider.environment = Object.assign(this.serverless.service.provider.environment || {}, environment, dotenv.config({ path: path.join(config.servicePath, '.env.local') }).parsed)
     })
   }
 
