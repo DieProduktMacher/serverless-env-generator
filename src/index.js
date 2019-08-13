@@ -84,7 +84,7 @@ class ServerlessEnvGeneratorPlugin {
       .on('exit', () => {
         if (fs.existsSync(config.dotEnvPath)) {
           fs.removeSync(config.dotEnvPath);
-            this.serverless.cli.log('Removed .env file')
+          this.serverless.cli.log('Removed .env file')
         }
       })
     return helper.getEnvVars(undefined, true, config).then(envFiles => {
@@ -106,7 +106,7 @@ class ServerlessEnvGeneratorPlugin {
     })
   }
 
-  // Sets options.environment used by serverless-local-dev-server
+  // Sets environment vars in serverless.service.provider.environment
   setEnvironment() {
     const config = this.getConfig()
     this.serverless.cli.log('Setting YAML environment variables …')
@@ -117,7 +117,7 @@ class ServerlessEnvGeneratorPlugin {
           environment[envVar.attribute] = envVar.value
         })
       })
-      this.options.environment = Object.assign(this.serverless.service.provider.environment, environment, dotenv.config({ path: path.join(config.servicePath, '.env.local') }).parsed)
+      this.serverless.service.provider.environment = Object.assign(this.serverless.service.provider.environment || {}, environment, dotenv.config({ path: path.join(config.servicePath, '.env.local') }).parsed)
     })
   }
 
