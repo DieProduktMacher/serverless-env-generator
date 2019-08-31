@@ -35,7 +35,13 @@ class ServerlessEnvGeneratorPlugin {
         commands: {
           generate: {
             usage: 'Creates the .env file manually',
-            lifecycleEvents: ['write']
+            lifecycleEvents: ['write'],
+            options: {
+              keepEnvFile: {
+                usage: 'Keep .env file after being manually generated',
+                shortcut: 'k'
+              }
+            }
           }
         }
       }
@@ -82,7 +88,7 @@ class ServerlessEnvGeneratorPlugin {
     this.serverless.cli.log('Creating .env file...')
     process
       .on('exit', () => {
-        if (fs.existsSync(config.dotEnvPath)) {
+        if (fs.existsSync(config.dotEnvPath && !this.options.keepEnvFile)) {
           fs.removeSync(config.dotEnvPath);
             this.serverless.cli.log('Removed .env file')
         }

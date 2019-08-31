@@ -249,6 +249,25 @@ describe('index.js', () => {
     })
   })
 
+  it('should write and keep .env file upon manual generation', () => {
+    initEnvGenerator({
+      keepEnvFile: true
+    })
+    sandbox.stub(helper, 'getEnvVars').callsFake(() => {
+      return Promise.resolve(defaultEnvFiles)
+    })
+    sandbox.stub(fs, 'writeFile').callsFake((file, content) => {
+      return Promise.resolve()
+    })
+    sandbox.stub(fs, 'remove').callsFake(_ => {
+      return Promise.resolve()
+    })
+    return envGenerator.hooks['env:generate:write']().then(_ => {
+      expect(fs.writeFile.callCount).to.equal(1)
+      expect(fs.remove.callCount).to.equal(0)
+    })
+  })
+
   it('should work with single kms key', () => {
     serverless.service.custom.envEncryptionKeyId = 'allthesinglekeys'
     initEnvGenerator({})
